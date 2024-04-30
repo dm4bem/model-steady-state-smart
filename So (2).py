@@ -12,10 +12,22 @@ np.set_printoptions(precision=1)
 # Data
 # ====
 # dimensions
-L1, L2, c1, c2 = 8, 10, 3, 4  # m
+L1, L2, c1, c2 = 4, 6, 3, 4  # m
 H = 3        # m
+H_vitre = 1   #m
+L_vitre = 1  #m
 W_mur_ext = 0.20,   # m
 w_mur_int = 0.10,   # m
+
+# B prend en compte w_int !!!!
+
+# surfaces
+S_A_mur_ext = (L1+(c1-L_vitre))*H + L_vitre*(H-H_vitre) + W_mur_ext*2*H
+
+S_B_mur_ext = ((L2-L_vitre)+c1+2*W_mur_ext+w_mur_int)*H + L_vitre*(H-H_vitre)
+
+S_C_mur_ext = (L1+L2+w_mur_int-2*L_vitre+2*c2+4*W_mur_ext)*H + 2*L_vitre*(H-H_vitre)
+
 
 # thermo-physical propertites
 λ = 1.7             # W/(m K) wall thermal conductivity
@@ -44,35 +56,42 @@ nq, nθ = 20, 8  # number of flow-rates branches and of temperaure nodes
 # ================
 A = np.zeros([nq, nθ])
 
-# q0 ... q3 (cyan branches)
+# q0 ... q2 Convection extérieure
 A[0, 0] = 1
-A[1, 1] = 1
+A[1, 3] = 1
 A[2, 5] = 1
-A[3, 7] = 1
 
-# q4 ... q7 (blue branches)
-A[4, 0], A[4, 3] = -1, 1
-A[5, 1], A[5, 2] = -1, 1
-A[6, 4], A[6, 5] = -1, 1
-A[7, 7], A[7, 6] = -1, 1
+# q3 ... q5 Conduction/convection extérieure/intérieure
+A[3, 1], A[3, 0] = 1, -1
+A[4, 3], A[4, 2] = 1, -1
+A[5, 4], A[5, 5] = 1, -1
 
-# q8 ... q12 (yellow branches)
-A[8, 2], A[8, 3] = -1, 1
-A[9, 3], A[9, 4] = -1, 1
-A[10, 6], A[10, 2] = -1, 1
-A[11, 6], A[11, 3] = -1, 1
-A[12, 6], A[12, 4] = -1, 1
 
-# q13 ... q15 (green branches)
+# q6 ... q8 vitre
+A[6, 1], A[6, 6] = 1,-1
+A[7, 2], A[7, 7] = 1, -1
+A[8, 4], A[8, 8] = 1, -1
+
+
+# q9 ... q11 Conduction/convection intérieure/intérieure
+A[9, 1],A[9, 2] = -1,1
+A[10, 2], A[10, 4] = 1, -1
+A[11, 1],A[11, 4] = 1,-1
+
+# q12 ... q14 Ventillation extérieure
+A[12, 2] = 1
 A[13, 3] = 1
-A[14, 3], A[14, 6] = -1, 1
-A[15, 6] = 1
+A[14, 4] = 1
 
-# q16 ... q19 (red branches)
-A[16, 2] = 1
-A[17, 3] = 1
-A[18, 4] = 1
-A[19, 6] = 1
+# q15, q16 Ventillation intérieure
+A[15, 2],A[15, 4] = 1,-1
+A[16, 1],A[15, 4] = 1,-1
+
+# q17 ... q19 Régulateur de température
+A[17, 1] = 1
+A[18, 2] = 1
+A[19, 4] = 1
+
 
 # Conductance matrix
 # ==================
