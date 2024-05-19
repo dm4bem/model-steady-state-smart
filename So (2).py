@@ -14,12 +14,12 @@ np.set_printoptions(precision=1)
 # dimensions
 L1, L2, c1, c2 = 4, 6, 3, 4  # m
 H = 3        # m
-H_vitre = 1   #m
-L_vitre = 1  #m
-W_mur_ext = 0.20,   # m
+H_vitre = 1   # m
+L_vitre = 1  # m
+W_mur_ext = 0.30,   # m
 w_mur_int = 0.10,   # m
 
-# B prend en compte w_int !!!!
+# Pièce B prend en compte w_int !!!!
 
 # surfaces
 S_A_mur_ext = (L1+(c1-L_vitre))*H + L_vitre*(H-H_vitre) + W_mur_ext*2*H
@@ -30,7 +30,9 @@ S_C_mur_ext = (L1+L2+w_mur_int-2*L_vitre+2*c2+4*W_mur_ext)*H + 2*L_vitre*(H-H_vi
 
 
 # thermo-physical propertites
-λ = 1.7             # W/(m K) wall thermal conductivity
+λ_concrete = 1.4             # W/(m K) concrete thermal conductivity
+λ_insulation = 0.04          # W/(m K) insulation thermal conductivity
+λ_glass = 1.4                # W/(m K) insulation thermal conductivity
 ρ, c = 1.2, 1000    # kg/m3, J/(kg K) density, specific heat air
 hi, ho = 8, 25      # W/(m2 K) convection coefficients in, out
 
@@ -43,14 +45,14 @@ To = 0              # °C
 # ventilation rate (air-changes per hour)
 ACH = 1             # volume/h
 
-VA_dot =L1 * c1 * H * ACH / 3600  # volumetric air flow rate
+VA_dot = L1 * c1 * H * ACH / 3600  # volumetric air flow rate
 VB_dot = L2 * c1 * H * ACH / 3600  # volumetric air flow rate
 VC_dot = (L1+L2+w_mur_int) * c2 * H * ACH / 3600  # volumetric air flow rate
 mA_dot = ρ * VA_dot               # mass air flow rate
-mB_dot = ρ * VB_dot 
-mC_dot = ρ * VC_dot 
+mB_dot = ρ * VB_dot               # mass air flow rate
+mC_dot = ρ * VC_dot               # mass air flow rate
 
-nq, nθ = 20, 8  # number of flow-rates branches and of temperaure nodes
+nq, nθ = 23, 8  # number of flow-rates branches and of temperaure nodes
 
 # Incidence matrix
 # ================
@@ -67,42 +69,44 @@ A[4, 3], A[4, 2] = 1, -1
 A[5, 4], A[5, 5] = 1, -1
 
 
-# q6 ... q8 vitre
+# q6 ... q8 vitre à vérifier !!
 A[6, 1], A[6, 6] = 1,-1
 A[7, 2], A[7, 7] = 1, -1
 A[8, 4], A[8, 8] = 1, -1
 
+# q9 ... q11 Radiation solaire
+A[9, 1] = 1
+A[10, 2] = 1
+A[11, 4] = 1
 
-# q9 ... q11 Conduction/convection intérieure/intérieure
-A[9, 1],A[9, 2] = -1,1
-A[10, 2], A[10, 4] = 1, -1
-A[11, 1],A[11, 4] = 1,-1
+# q12 ... q14 Conduction/convection intérieure/intérieure
+A[12, 1],A[12, 2] = -1,1
+A[13, 2], A[13, 4] = 1, -1
+A[14, 1],A[14, 4] = 1,-1
 
-# q12 ... q14 Ventillation extérieure
-A[12, 2] = 1
-A[13, 3] = 1
-A[14, 4] = 1
+# q15 ... q17 Ventillation extérieure
+A[15, 1] = 1
+A[16, 2] = 1
+A[17, 4] = 1
 
-# q15, q16 Ventillation intérieure
-A[15, 2],A[15, 4] = 1,-1
-A[16, 1],A[15, 4] = 1,-1
+# q18, q19 Ventillation intérieure
+A[18, 2],A[18, 4] = 1,-1
+A[19, 1],A[19, 4] = 1,-1
 
-# q17 ... q19 Régulateur de température
-A[17, 1] = 1
-A[18, 2] = 1
-A[19, 4] = 1
+# q20 ... q22 Régulateur de température
+A[20, 1] = 1
+A[21, 2] = 1
+A[22, 4] = 1
 
 
 # Conductance matrix
 # ==================
 G = np.zeros(A.shape[0])
 
-# G0 ... G3 (cyan branches): outdoor convection
-#L4 = 2 * l + 3 * L + 2 * w  	# length outdoor wall room 4
-Lc = L1 + L2 + w_mur_int + c1 + c2 + w_mur_int_    # length outdoor wall room 4
-#So = np.array([L, L + l, L + l, L4]) * H    # outdoor surfaces
-So = np.array([L, L + l, L + l, L4]) * H
-G[0:4] = ho * So
+# G0 ... G2 : outdoor convection
+G[0] = ho * S_A_mur_ext
+G[1] = ho * S_B_mur_ext
+G[2] = ho * S_C_mur_ext
 
 # G4 ... G7 (blue branches): conduction, indoor convection
 G[4:8] = 1 / (w / λ + 1 / hi) * So
@@ -112,7 +116,7 @@ G[4:8] = 1 / (w / λ + 1 / hi) * So
 Si = np.array([l, l, L, L, L]) * H
 G[8:13] = 1 / (1 / hi + w / λ + 1 / hi) * Si
 
-# G13 ... G15 (green branches): advection by ventilation
+# G13 ... G16 (green branches): advection by ventilation
 G[13:16] = np.zeros(3)
 
 # G16 ... G19 (red branches): gains of proportional controllers
