@@ -28,7 +28,7 @@ w_vitre = 0.02 # m
 S_A_mur_ext = (L1+(c1-L_vitre))*H + L_vitre*(H-H_vitre) + W_mur_ext*2*H
 S_A_mur_int = S_A_mur_ext - W_mur_ext*2*H
 S_B_mur_ext = ((L2-L_vitre)+c1+2*W_mur_ext+w_mur_int)*H + L_vitre*(H-H_vitre)
-S_B_mur_int = S_B_mur_ext - 2*W_mur_ext+w_mur_int)*H
+S_B_mur_int = (S_B_mur_ext - 2*W_mur_ext+w_mur_int)*H
 S_C_mur_ext = (L1+L2+w_mur_int-2*L_vitre+2*c2+4*W_mur_ext)*H + 2*L_vitre*(H-H_vitre)
 S_C_mur_int = S_C_mur_ext - 4*W_mur_ext*H
 S_fenetre = H_vitre*L_vitre
@@ -76,7 +76,7 @@ mBC_dot = L2 * c1 * H * ACH_int / 3600 * ρ
 σ = 5.67e-8     # W/(m²⋅K⁴) Stefan-Bolzmann constant
 
 
-nq, nθ = 23, 8  # number of flow-rates branches and of temperaure nodes
+nq, nθ = 32, 15  # number of flow-rates branches and of temperaure nodes
 
 # Incidence matrix
 # ================
@@ -206,7 +206,9 @@ G[27] = mAC_dot*c
 G[28] = mBC_dot*c
 
 # G29 ... G31 : gains of proportional controllers
-G[29:31] = np.zeros(3)
+G[29] = 0
+G[30] = 0
+G[31] = 0
 
 # Vector of temperature sources
 # =============================
