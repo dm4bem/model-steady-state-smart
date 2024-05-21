@@ -77,45 +77,58 @@ nq, nθ = 23, 8  # number of flow-rates branches and of temperaure nodes
 # ================
 A = np.zeros([nq, nθ])
 
-# q0 ... q2 Convection extérieure
-A[0, 0] = 1
-A[1, 3] = 1
-A[2, 5] = 1
+# q0 ... q5 Convection extérieure
+A[0, 3] = 1
+A[1, 7] = 1
+A[2, 11] = 1
+A[3, 5] = 1
+A[4, 9] = 1
+A[5, 12] = 1
 
-# q3 ... q5 Conduction/convection extérieure/intérieure
-A[3, 1], A[3, 0] = 1, -1
-A[4, 3], A[4, 2] = 1, -1
-A[5, 4], A[5, 5] = 1, -1
+# q6 q10 q14  Conduction murs extérieurs
+A[6, 4], A[6, 3] = 1, -1
+A[10, 7], A[10, 8] = -1, 1
+A[14, 13], A[14, 11] = 1, -1
+
+# q7 q11 q15 Conduction vitres extérieures
+A[7, 6], A[7, 5] = 1, -1
+A[11, 10], A[11, 9] = 1, -1
+A[15, 12], A[15,14] = -1, 1
+
+# q8 q12 q16 Convection murs intérieurs
+A[8, 0], A[8, 4] = 1, -1
+A[12, 8], A[12, 1] = 1, -1
+A[16, 2], A[16,13] = 1, -1
+
+# q9 q13 q17 Convection vitres intérieures
+A[9, 0], A[9, 6] = 1, -1
+A[13, 1], A[13, 10] = 1, -1
+A[17, 2], A[17,14] = 1, -1
+
+# q18 ... q20 radiation entre vitres et murs
+A[18, 4], A[18, 6] = 1, -1
+A[19, 8], A[19, 10] = 1, -1
+A[20, 13], A[20,14] = 1, -1
 
 
-# q6 ... q8 vitre sans radiation 
-A[6, 1]  = 1
-A[7, 2] = 1
-A[8, 4] = 1
+# q21 ... q23 Conduction/convection intérieure/intérieure
+A[21, 1],A[21, 0] = 1,-1
+A[22, 1], A[22, 2] = 1, -1
+A[23, 0],A[23, 2] = 1,-1
 
-# q9 ... q11 Radiation solaire
-A[9, 1] = 1
-A[10, 2] = 1
-A[11, 4] = 1
+# q24 ... q26 Ventillation extérieure
+A[24, 0] = 1
+A[25, 1] = 1
+A[26, 2] = 1
 
-# q12 ... q14 Conduction/convection intérieure/intérieure
-A[12, 1],A[12, 2] = -1,1
-A[13, 2], A[13, 4] = 1, -1
-A[14, 1],A[14, 4] = 1,-1
+# q27, q28 Ventillation intérieure
+A[27, 0],A[27, 2] = 1,-1
+A[28, 1],A[28, 2] = 1,-1
 
-# q15 ... q17 Ventillation extérieure
-A[15, 1] = 1
-A[16, 2] = 1
-A[17, 4] = 1
-
-# q18, q19 Ventillation intérieure
-A[18, 2],A[18, 4] = 1,-1
-A[19, 1],A[19, 4] = 1,-1
-
-# q20 ... q22 Régulateur de température
-A[20, 1] = 1
-A[21, 2] = 1
-A[22, 4] = 1
+# q29 ... q31 Régulateur de température
+A[29, 0] = 1
+A[30, 1] = 1
+A[31, 2] = 1
 
 
 # Conductance matrix
