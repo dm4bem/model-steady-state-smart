@@ -269,6 +269,13 @@ b[0:5] = To
 b[42:44] = To     # green branches: outdoor temperature for ventilation
 b[47:49] = 0    # red branches: setpoints room A,B & C
 
+
+# Capacity Matix
+# =============================
+
+
+
+
 # Vector of flow-rate sources
 # =============================
 f = np.zeros(A.shape[1])
