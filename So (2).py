@@ -202,8 +202,8 @@ G[23] = 1 / (w_mur_int_beton / λ_concrete + 2 / hi) * S_AC
 G[24] = mA_dot*c
 G[25] = mB_dot*c
 G[26] = mC_dot*c
-G[27] =0.5
-G[28] =
+G[27] = mAC_dot*c
+G[28] = mBC_dot*c
 
 # G29 ... G31 : gains of proportional controllers
 G[29:31] = np.zeros(3)
