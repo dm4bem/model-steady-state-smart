@@ -51,8 +51,8 @@ E = 200             # W/m2
 To = 0              # °C
 
 # ventilation rate (air-changes per hour)
-ACH_ext = 1             # volume/h
-ACH_ext = 1             # volume/h
+ACH_ext = 5             # volume/h fenetre à moitié ouverte
+ACH_int = 0.5             # volume/h porte/fenetre fermée
 
 VA_dot = L1 * c1 * H * ACH_ext / 3600  # volumetric air flow rate
 VB_dot = L2 * c1 * H * ACH_ext / 3600  # volumetric air flow rate
@@ -61,7 +61,9 @@ VC_dot = (L1+L2+w_mur_int) * c2 * H * ACH_ext / 3600  # volumetric air flow rate
 mA_dot = ρ * VA_dot               # mass air flow rate
 mB_dot = ρ * VB_dot               # mass air flow rate
 mC_dot = ρ * VC_dot               # mass air flow rate
-mAC_dot = L1 * c1 * H * 
+
+mAC_dot = L1 * c1 * H * ACH_int / 3600 * ρ
+mBC_dot = L2 * c1 * H * ACH_int / 3600 * ρ
 
 
 
