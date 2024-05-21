@@ -223,51 +223,30 @@ b[29:31] = 19    # red branches: setpoints room A,B & C
 # =============================
 f = np.zeros(A.shape[1])
 
+#solar radaition _ wall
+f[3] = α_wSW*S_A_mur_ext*E
+f[7] = α_wSW*S_B_mur_ext*E
+f[11] = α_wSW*S_C_mur_ext*E
+
+#solar radaition _ glasses
+f[5] = α_gSW*S_fenetre*E
+f[9] = α_gSW*S_fenetre*E
+f[12] = α_gSW*2*S_fenetre*E
+
+
+
 # Indexes of outputs
 # ==================
 indoor_air = [0, 1, 2]   # indoor air temperature nodes
-controller = range(29, 31)  # controller branches
+controller = range(29, 32)  # controller branches
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Question 1 : all rooms are controlled
+#results
 # ==================
 print(f"Maximum value of conductance: {max(G):.0f} W/K")
 
 b[controller] = 20, 20, 22  # °C setpoint temperature of the rooms
-G[controller] = 1e9             # P-controller gain
+G[controller] = 1e9           # Kp-controller gain
 
 θ = np.linalg.inv(A.T @ np.diag(G) @ A) @ (A.T @ np.diag(G) @ b + f)
 q = np.diag(G) @ (-A @ θ + b)
@@ -275,42 +254,36 @@ print("1. All 4 rooms controlled")
 print("θ:", θ[indoor_air], "°C")
 print("q:", q[controller], "W")
 
-# Question 2
-# ===================
-# Zone 2 & 4 free-running; solar rad; without ventilation
-G[[17, 19]] = 0     # controller gains for room 2 & 4
 
-# Solar radiation
-exterior_wall = [0, 1, 5, 7]
-f[exterior_wall] = E * S
 
-θ = np.linalg.inv(A.T @ np.diag(G) @ A) @ (A.T @ np.diag(G) @ b + f)
-q = np.diag(G) @ (-A @ θ + b)
-print("2. 2 & 4 free-run w/o ventilation")
-print("θ:", θ[indoor_air], "°C")
-print("q:", q[controller], "W")
 
-# Question 3
-# ===================
-# Zone 2 & 4 free-running; solar rad;
-# Ventilation outdoor -> room 2 -> room 4 -> outdoor
-ventilation = range(13, 16)
-G[ventilation] = m_dot * c, m_dot * c, 0
 
-θ = np.linalg.inv(A.T @ np.diag(G) @ A) @ (A.T @ np.diag(G) @ b + f)
-q = np.diag(G) @ (-A @ θ + b)
-print("3. 2 & 4 free-run, ventilation out -> 2 -> 4 -> out")
-print("θ:", θ[indoor_air], "°C")
-print("q:", q[controller], "W")
 
-# Question 4
-# ===================
-# Zone 2 & 4 free-running; solar rad;
-# Ventilation outdoor -> room 4 -> room 2 -> outdoor
-G[ventilation] = 0, m_dot * c, m_dot * c
 
-θ = np.linalg.inv(A.T @ np.diag(G) @ A) @ (A.T @ np.diag(G) @ b + f)
-q = np.diag(G) @ (-A @ θ + b)
-print("4. 2 & 4 free-run, ventilation out -> 4 -> 2 -> out")
-print("θ:", θ[indoor_air], "°C")
-print("q:", q[controller], "W")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
