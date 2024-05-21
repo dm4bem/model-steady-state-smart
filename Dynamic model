@@ -19,8 +19,8 @@ H = 3        # m
 H_vitre = 1   # m
 L_vitre = 1  # m
 W_mur_ext = 0.30   # m
-w_mur_int_beton = 0.20   # m
-w_mur_int_insulation = 0.1 # m
+w_mur_ext_beton = 0.20   # m
+w_mur_ext_insulation = 0.1 # m
 w_mur_int = 0.3 # m
 w_vitre = 0.02 # m
 
@@ -163,32 +163,44 @@ G[0] = ho * S_A_mur_ext
 G[1] = ho * S_B_mur_ext
 G[2] = ho * S_C_mur_ext
 
-# G3 ... G5 : outdoor convection wall
+# G3 ... G5 : outdoor convection glasses
 G[3] = ho * S_fenetre
 G[4] = ho * S_fenetre
 G[5] = ho * S_fenetre*2
 
-# G6 G10 G14 : conduction outdoor wall
-G[6] = 1 / (w_mur_int_beton / λ_concrete + w_mur_int_insulation / λ_insulation ) * S_A_mur_ext
-G[10] = 1 / (w_mur_int_beton / λ_concrete + w_mur_int_insulation / λ_insulation ) * S_B_mur_ext
-G[14] = 1 / (w_mur_int_beton / λ_concrete + w_mur_int_insulation / λ_insulation ) * S_C_mur_ext
+# G6...G19 : conduction outdoor wall
+# : conduction outdoor wall beton
+G[6] = 1 / (w_mur_ext_beton / 2*λ_concrete ) * S_A_mur_ext
+G[7] = 1 / (w_mur_ext_beton / 2*λ_concrete ) * S_A_mur_ext
+G[11] = 1 / (w_mur_ext_beton / 2*λ_concrete ) * S_B_mur_ext
+G[12] = 1 / (w_mur_ext_beton / 2*λ_concrete ) * S_B_mur_ext
+G[16] = 1 / (w_mur_ext_beton / 2*λ_concrete ) * S_C_mur_ext
+G[17] = 1 / (w_mur_ext_beton / 2*λ_concrete ) * S_C_mur_ext
+
+# : conduction outdoor wall insulation
+G[8] = 1 / (w_mur_ext_insulation / 2*λ_insulation ) * S_A_mur_ext
+G[9] = 1 / (w_mur_ext_insulation / 2*λ_insulation ) * S_A_mur_ext
+G[13] = 1 / (w_mur_ext_insulation / 2*λ_insulation ) * S_B_mur_ext
+G[14] = 1 / (w_mur_ext_insulation / 2*λ_insulation ) * S_B_mur_ext
+G[18] = 1 / (w_mur_ext_insulation / 2*λ_insulation ) * S_C_mur_ext
+G[19] = 1 / (w_mur_ext_insulation / 2*λ_insulation ) * S_C_mur_ext
 
 
-# G7 G11 G15 : conduction for the window
-G[7] = 1 / ( w_vitre / λ_window ) * S_fenetre
-G[11] = 1 / ( w_vitre / λ_window ) * S_fenetre
-G[15] = 1 / ( w_vitre / λ_window ) * 2*S_fenetre
+# G10 G15 G20 : conduction for the window
+G[10] = 1 / ( w_vitre / λ_window ) * S_fenetre
+G[15] = 1 / ( w_vitre / λ_window ) * S_fenetre
+G[20] = 1 / ( w_vitre / λ_window ) * 2*S_fenetre
 
 
-# G8,9 G12,13 G16,17 : indoor convection
-G[8]= hi * S_A_mur_int
-G[9]= hi * S_fenetre
-G[12]= hi * S_B_mur_int
-G[13]= hi * S_fenetre
-G[16]= hi * S_C_mur_int
-G[17]= hi * 2*S_fenetre
+# G21...G26 : indoor convection
+G[21]= hi * S_A_mur_int
+G[22]= hi * S_fenetre
+G[23]= hi * S_B_mur_int
+G[24]= hi * S_fenetre
+G[25]= hi * S_C_mur_int
+G[26]= hi * 2*S_fenetre
 
-# G18 ... G20 : long wave radiation
+# G27 ... G29 : long wave radiation
 
 # long wave radiation
 Tm = 20 + 273   # K, mean temp for radiative exchange
@@ -197,31 +209,52 @@ F_A = S_fenetre / S_A_mur_int
 GLW_mur_A = 4 * σ * Tm**3 * ε_wLW / (1 - ε_wLW) * S_A_mur_int
 GLW_mur_vitre_A = 4 * σ * Tm**3 * F_A * S_A_mur_int
 GLW_vitre_A = 4 * σ * Tm**3 * ε_gLW / (1 - ε_gLW) * S_fenetre
-G[18] = 1 / (1 / GLW_mur_A + 1 / GLW_mur_vitre_A + 1 / GLW_vitre_A)
+G[27] = 1 / (1 / GLW_mur_A + 1 / GLW_mur_vitre_A + 1 / GLW_vitre_A)
 
 F_B = S_fenetre / S_B_mur_int
 GLW_mur_B = 4 * σ * Tm**3 * ε_wLW / (1 - ε_wLW) * S_B_mur_int
 GLW_mur_vitre_B = 4 * σ * Tm**3 * F_B * S_B_mur_int
 GLW_vitre_B = 4 * σ * Tm**3 * ε_gLW / (1 - ε_gLW) * S_fenetre
-G[19] = 1 / (1 / GLW_mur_B + 1 / GLW_mur_vitre_B + 1 / GLW_vitre_B)
+G[28] = 1 / (1 / GLW_mur_B + 1 / GLW_mur_vitre_B + 1 / GLW_vitre_B)
 
 F_C = 2*S_fenetre / S_C_mur_int
 GLW_mur_C = 4 * σ * Tm**3 * ε_wLW / (1 - ε_wLW) * S_C_mur_int
 GLW_mur_vitre_C = 4 * σ * Tm**3 * F_C * S_C_mur_int
 GLW_vitre_C = 4 * σ * Tm**3 * ε_gLW / (1 - ε_gLW) * 2*S_fenetre
-G[20] = 1 / (1 / GLW_mur_C + 1 / GLW_mur_vitre_C + 1 / GLW_vitre_C)
+G[29] = 1 / (1 / GLW_mur_C + 1 / GLW_mur_vitre_C + 1 / GLW_vitre_C)
 
-# G21 ... G23 : internal convection, conduction, internal conduction
-G[21] = 1 / (w_mur_int_beton / λ_concrete + 2 / hi) * S_AB
-G[22] = 1 / (w_mur_int_beton / λ_concrete + 2 / hi) * S_BC
-G[23] = 1 / (w_mur_int_beton / λ_concrete + 2 / hi) * S_AC
+# G30...G41 : internal convection, conduction, internal conduction
+
+#A-B
+#convection
+G[30] = hi * S_AB
+G[33] = hi * S_AB
+#conduction
+G[31] = 1 / (w_mur_int_beton / 2*λ_concrete ) * S_AB
+G[32] = 1 / (w_mur_int_beton / 2*λ_concrete ) * S_AB
+
+#B-C
+#convection
+G[34] = hi * S_BC
+G[37] = hi * S_BC
+#conduction
+G[35] = 1 / (w_mur_int_beton / 2*λ_concrete ) * S_BC
+G[36] = 1 / (w_mur_int_beton / 2*λ_concrete ) * S_BC
+
+#A-C
+#convection
+G[38] = hi * S_AC
+G[41] = hi * S_AC
+#conduction
+G[39] = 1 / (w_mur_int_beton / 2*λ_concrete ) * S_AC
+G[40] = 1 / (w_mur_int_beton / 2*λ_concrete ) * S_AC
 
 # G24 ... G28 : Ventilation
-G[24] = mA_dot*c
-G[25] = mB_dot*c
-G[26] = mC_dot*c
-G[27] = mAC_dot*c
-G[28] = mBC_dot*c
+G[42] = mA_dot*c
+G[43] = mB_dot*c
+G[44] = mC_dot*c
+G[46] = mAC_dot*c
+G[45] = mBC_dot*c
 
 # G29 ... G31 : gains of proportional controllers
 G[29] = 0
@@ -233,8 +266,8 @@ G[31] = 0
 b = np.zeros(A.shape[0])
   
 b[0:5] = To
-b[24:26] = To     # green branches: outdoor temperature for ventilation
-b[29:31] = 19    # red branches: setpoints room A,B & C
+b[42:44] = To     # green branches: outdoor temperature for ventilation
+b[47:49] = 0    # red branches: setpoints room A,B & C
 
 # Vector of flow-rate sources
 # =============================
@@ -242,20 +275,20 @@ f = np.zeros(A.shape[1])
 
 #solar radaition _ wall
 f[3] = α_wSW*S_A_mur_ext*E
-f[7] = α_wSW*S_B_mur_ext*E
-f[11] = α_wSW*S_C_mur_ext*E
+f[9] = α_wSW*S_B_mur_ext*E
+f[15] = α_wSW*S_C_mur_ext*E
 
 #solar radaition _ glasses
-f[5] = α_gSW*S_fenetre*E
-f[9] = α_gSW*S_fenetre*E
-f[12] = α_gSW*2*S_fenetre*E
+f[7] = α_gSW*S_fenetre*E
+f[13] = α_gSW*S_fenetre*E
+f[19] = α_gSW*2*S_fenetre*E
 
 
 
 # Indexes of outputs
 # ==================
 indoor_air = [0, 1, 2]   # indoor air temperature nodes
-controller = range(29, 32)  # controller branches
+controller = range(47,50)  # controller branches
 
 
 #results
