@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 """
 Created on Thu Apr 11 14:38:11 2024
@@ -213,10 +214,10 @@ G[31] = 0
 # Vector of temperature sources
 # =============================
 b = np.zeros(A.shape[0])
-
-b[0:4] = To         # cyan branches: outdoor temperature for walls
-b[[13, 15]] = To    # green branches: outdoor temperature for ventilation
-b[[16, 18]] = 20, 22    # red branches: setpoints room 1 & 3c
+  
+b[0:5] = To
+b[24:26] = To     # green branches: outdoor temperature for ventilation
+b[29:31] = 19    # red branches: setpoints room A,B & C
 
 # Vector of flow-rate sources
 # =============================
@@ -224,14 +225,48 @@ f = np.zeros(A.shape[1])
 
 # Indexes of outputs
 # ==================
-indoor_air = [2, 3, 4, 6]   # indoor air temperature nodes
-controller = range(16, 20)  # controller branches
+indoor_air = [0, 1, 2]   # indoor air temperature nodes
+controller = range(29, 31)  # controller branches
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Question 1 : all rooms are controlled
 # ==================
 print(f"Maximum value of conductance: {max(G):.0f} W/K")
 
-b[controller] = 20, 20, 22, 18  # °C setpoint temperature of the rooms
+b[controller] = 20, 20, 22  # °C setpoint temperature of the rooms
 G[controller] = 1e9             # P-controller gain
 
 θ = np.linalg.inv(A.T @ np.diag(G) @ A) @ (A.T @ np.diag(G) @ b + f)
@@ -247,7 +282,7 @@ G[[17, 19]] = 0     # controller gains for room 2 & 4
 
 # Solar radiation
 exterior_wall = [0, 1, 5, 7]
-f[exterior_wall] = E * So
+f[exterior_wall] = E * S
 
 θ = np.linalg.inv(A.T @ np.diag(G) @ A) @ (A.T @ np.diag(G) @ b + f)
 q = np.diag(G) @ (-A @ θ + b)
