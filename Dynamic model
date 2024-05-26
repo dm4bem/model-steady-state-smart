@@ -201,8 +201,6 @@ G[25]= hi * S_C_mur_int
 G[26]= hi * 2*S_fenetre
 
 # G27 ... G29 : long wave radiation
-
-# long wave radiation
 Tm = 20 + 273   # K, mean temp for radiative exchange
 
 F_A = S_fenetre / S_A_mur_int
