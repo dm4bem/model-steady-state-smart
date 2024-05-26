@@ -38,16 +38,28 @@ S_AB = c1*H
 S_AC = L1*H
 S_BC = L2*H
 
+# volumes
+V_A = L1*c1*H # m³
+V_B = L2 * c1 * H # m³
+V_C = (L1+L2+w_mur_int) * c2 * H # m³
+
 
 # thermo-physical propertites
 λ_concrete = 1.4             # W/(m K) concrete thermal conductivity
-λ_insulation = 0.04          # W/(m K) insulation thermal conductivity
-λ_window = 1.4               # W/(m K) insulation thermal conductivity
-ρ, c = 1.2, 1000    # kg/m3, J/(kg K) density, specific heat air
-hi, ho = 8, 25      # W/(m2 K) convection coefficients in, out
+ρ_concrete = 2300            # kg/m³ concrete volumic mass
+c_concrete = 880             # J/(kg⋅K) concrete specific heat
+λ_insulation = 0.027          # W/(m K) insulation thermal conductivity
+ρ_insulation = 55            # kg/m³ insulation volumic mass
+c_insulation = 1210             # J/(kg⋅K) insulation specific heat
+λ_window = 1.4               # W/(m K) window thermal conductivity
+ρ_window = 2500            # kg/m³ window volumic mass
+c_window = 1210             # J/(kg⋅K) window specific heat
+
+ρ, c = 1.2, 1000    # kg/m³, J/(kg K) density, specific heat air
+hi, ho = 8, 25      # W/(m² K) convection coefficients in, out
 
 # short-wave solar radiation absorbed by each wall
-E = 200             # W/m2
+E = 200             # W/m²
 
 # outdoor temperature
 To = 0              # °C
@@ -56,9 +68,9 @@ To = 0              # °C
 ACH_ext = 5             # volume/h fenetre à moitié ouverte
 ACH_int = 0.5             # volume/h porte/fenetre fermée
 
-VA_dot = L1 * c1 * H * ACH_ext / 3600  # volumetric air flow rate
-VB_dot = L2 * c1 * H * ACH_ext / 3600  # volumetric air flow rate
-VC_dot = (L1+L2+w_mur_int) * c2 * H * ACH_ext / 3600  # volumetric air flow rate
+VA_dot = V_A * ACH_ext / 3600  # volumetric air flow rate
+VB_dot = V_B * ACH_ext / 3600  # volumetric air flow rate
+VC_dot = V_C * ACH_ext / 3600  # volumetric air flow rate
 
 mA_dot = ρ * VA_dot               # mass air flow rate
 mB_dot = ρ * VB_dot               # mass air flow rate
@@ -221,7 +233,7 @@ GLW_mur_vitre_C = 4 * σ * Tm**3 * F_C * S_C_mur_int
 GLW_vitre_C = 4 * σ * Tm**3 * ε_gLW / (1 - ε_gLW) * 2*S_fenetre
 G[29] = 1 / (1 / GLW_mur_C + 1 / GLW_mur_vitre_C + 1 / GLW_vitre_C)
 
-# G30...G41 : internal convection, conduction, internal conduction
+# G30 ... G41 : internal convection, conduction, internal conduction
 
 #A-B
 #convection
@@ -268,10 +280,25 @@ b[42:44] = To     # green branches: outdoor temperature for ventilation
 b[47:49] = 0    # red branches: setpoints room A,B & C
 
 
-# Capacity Matix
+# Capacity Matrix
 # =============================
-
-
+C = np.zeros(A.shape[0])
+# C0 ... C2 : Air
+C[0] = ρ*c*V_A
+C[1] = ρ*c*V_B
+C[2] = ρ*c*V_C
+# C4 C10 C16 : Béton
+C[4] = ρ_concrete*c_concrete*S_A_mur_ext*c1
+C[10] = ρ_concrete*c_concrete*S_B_mur_ext*c1
+C[16] = ρ_concrete*c_concrete*S_C_mur_ext*c2
+# C5 C11 C17 : Paroi isolante
+C[5] = ρ_insulation*c_insulation*S_A_mur_ext*c1
+C[11] = ρ_insulation*c_insulation*S_B_mur_ext*c1
+C[17] = ρ_insulation*c_insulation*S_C_mur_ext*c2
+# C7 C13 C19 : Vitre
+C[7] = ρ_window*c_window*S_fenetre*L_vitre
+C[13] = ρ_window*c_window*S_fenetre*L_vitre
+C[19] = ρ_window*c_window*2*S_fenetre*L_vitre
 
 
 # Vector of flow-rate sources
@@ -308,29 +335,6 @@ q = np.diag(G) @ (-A @ θ + b)
 print("1. All 4 rooms controlled")
 print("θ:", θ[indoor_air], "°C")
 print("q:", q[controller], "W")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
